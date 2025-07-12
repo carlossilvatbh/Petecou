@@ -1,0 +1,141 @@
+{% extends 'jogos/base.html' %}
+
+{% block title %}Lançar Resultado - Peteca Scout{% endblock %}
+
+{% block content %}
+<h2>🎯 Lançar Resultado de Partida</h2>
+
+{% if messages %}
+    {% for message in messages %}
+        <div style="padding: 15px; margin-bottom: 20px; border-radius: 5px; 
+                    background-color: {% if message.tags == 'success' %}#d4edda; color: #155724; border: 1px solid #c3e6cb{% else %}#f8d7da; color: #721c24; border: 1px solid #f5c6cb{% endif %};">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
+    <h4>📋 Regras do Jogo</h4>
+    <ul>
+        <li><strong>Pontuação máxima:</strong> 20 pontos</li>
+        <li><strong>Capotinho:</strong> Quando a dupla perdedora faz 10 pontos ou menos</li>
+        <li><strong>Vitória:</strong> Primeira dupla a chegar em 20 pontos ou vencer com diferença mínima de 2 pontos</li>
+        <li><strong>Não há empates</strong></li>
+    </ul>
+</div>
+
+<form method="post" style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    {% csrf_token %}
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+        <div>
+            <h3 style="color: #3498db;">🔵 Dupla 1</h3>
+            <label for="dupla1" style="font-weight: bold; display: block; margin-bottom: 5px;">Escolha a Dupla:</label>
+            <select name="dupla1" id="dupla1" required style="width: 100%; padding: 10px; border: 2px solid #3498db; border-radius: 5px; font-size: 16px;">
+                <option value="">Selecione uma dupla...</option>
+                {% for dupla in duplas %}
+                    <option value="{{ dupla.id }}">{{ dupla }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="pontos_dupla1" style="font-weight: bold; display: block; margin-top: 15px; margin-bottom: 5px;">Pontos:</label>
+            <input type="number" name="pontos_dupla1" id="pontos_dupla1" min="0" max="20" required 
+                   style="width: 100%; padding: 10px; border: 2px solid #3498db; border-radius: 5px; font-size: 16px;">
+        </div>
+        
+        <div>
+            <h3 style="color: #e74c3c;">🔴 Dupla 2</h3>
+            <label for="dupla2" style="font-weight: bold; display: block; margin-bottom: 5px;">Escolha a Dupla:</label>
+            <select name="dupla2" id="dupla2" required style="width: 100%; padding: 10px; border: 2px solid #e74c3c; border-radius: 5px; font-size: 16px;">
+                <option value="">Selecione uma dupla...</option>
+                {% for dupla in duplas %}
+                    <option value="{{ dupla.id }}">{{ dupla }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="pontos_dupla2" style="font-weight: bold; display: block; margin-top: 15px; margin-bottom: 5px;">Pontos:</label>
+            <input type="number" name="pontos_dupla2" id="pontos_dupla2" min="0" max="20" required 
+                   style="width: 100%; padding: 10px; border: 2px solid #e74c3c; border-radius: 5px; font-size: 16px;">
+        </div>
+    </div>
+    
+    <div style="margin-bottom: 30px;">
+        <label for="data" style="font-weight: bold; display: block; margin-bottom: 5px;">Data da Partida:</label>
+        <input type="date" name="data" id="data" value="{{ hoje|date:'Y-m-d' }}" 
+               style="padding: 10px; border: 2px solid #95a5a6; border-radius: 5px; font-size: 16px;">
+        <small style="color: #7f8c8d; display: block; margin-top: 5px;">Deixe em branco para usar a data de hoje</small>
+    </div>
+    
+    <button type="submit" style="background-color: #27ae60; color: white; border: none; padding: 15px 30px; border-radius: 5px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%;">
+        🏆 Registrar Partida
+    </button>
+</form>
+
+<div style="margin-top: 30px; text-align: center;">
+    <a href="{% url 'jogos:home' %}" style="color: #3498db; text-decoration: none; font-weight: bold;">
+        ← Voltar ao Início
+    </a>
+</div>
+
+<script>
+    // Validação em tempo real
+    document.getElementById('pontos_dupla1').addEventListener('input', function() {
+        const valor = parseInt(this.value);
+        if (valor > 20) {
+            this.value = 20;
+            alert('Pontuação máxima é 20!');
+        }
+    });
+    
+    document.getElementById('pontos_dupla2').addEventListener('input', function() {
+        const valor = parseInt(this.value);
+        if (valor > 20) {
+            this.value = 20;
+            alert('Pontuação máxima é 20!');
+        }
+    });
+    
+    // Validação antes do envio
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const dupla1 = document.getElementById('dupla1').value;
+        const dupla2 = document.getElementById('dupla2').value;
+        const pontos1 = parseInt(document.getElementById('pontos_dupla1').value);
+        const pontos2 = parseInt(document.getElementById('pontos_dupla2').value);
+        
+        if (dupla1 === dupla2) {
+            e.preventDefault();
+            alert('Uma dupla não pode jogar contra si mesma!');
+            return;
+        }
+        
+        if (pontos1 === pontos2) {
+            e.preventDefault();
+            alert('Não pode haver empate!');
+            return;
+        }
+        
+        // Verifica se o jogo terminou corretamente
+        const maxPontos = Math.max(pontos1, pontos2);
+        const minPontos = Math.min(pontos1, pontos2);
+        
+        if (maxPontos < 20 && (maxPontos - minPontos) < 2) {
+            if (!confirm('O jogo não chegou a 20 pontos e a diferença é menor que 2. Tem certeza?')) {
+                e.preventDefault();
+                return;
+            }
+        }
+        
+        // Aviso sobre capotinho
+        if (minPontos <= 10) {
+            const duplaperdedora = pontos1 < pontos2 ? 
+                document.getElementById('dupla1').selectedOptions[0].text : 
+                document.getElementById('dupla2').selectedOptions[0].text;
+            
+            if (!confirm(`CAPOTINHO! ${duplaperdedora} fez apenas ${minPontos} pontos. Confirmar?`)) {
+                e.preventDefault();
+                return;
+            }
+        }
+    });
+</script>
+{% endblock %}

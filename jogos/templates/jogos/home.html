@@ -1,0 +1,68 @@
+{% extends 'jogos/base.html' %}
+
+{% block title %}Peteca Scout - Início{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 40px;">
+    <h2>🏓 Bem-vindo ao Peteca Scout!</h2>
+    <p style="font-size: 18px; color: #7f8c8d; margin: 20px 0;">
+        Sistema de acompanhamento de partidas de peteca com rankings individuais e de duplas.
+    </p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px;">
+    <div style="background-color: #f39c12; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <h3>🎯 Lançar Resultado</h3>
+        <p>Registre o resultado de uma partida com as novas regras de 20 pontos e capotinhos.</p>
+        <a href="{% url 'jogos:lancar_resultado' %}" 
+           style="background-color: white; color: #f39c12; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Lançar Resultado
+        </a>
+    </div>
+    
+    <div style="background-color: #3498db; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <h3>📊 Ranking Individual</h3>
+        <p>Veja o desempenho dos jogadores com estatísticas detalhadas incluindo capotinhos.</p>
+        <a href="{% url 'jogos:ranking_individual' %}" 
+           style="background-color: white; color: #3498db; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Ver Ranking
+        </a>
+    </div>
+    
+    <div style="background-color: #e74c3c; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <h3>👥 Ranking de Duplas</h3>
+        <p>Acompanhe o desempenho das duplas e veja quais são as mais vitoriosas.</p>
+        <a href="{% url 'jogos:ranking_duplas' %}" 
+           style="background-color: white; color: #e74c3c; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Ver Ranking
+        </a>
+    </div>
+    
+    <div style="background-color: #27ae60; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <h3>⚙️ Administração</h3>
+        <p>Gerencie jogadores, duplas e partidas através da interface administrativa.</p>
+        <a href="/admin/" 
+           style="background-color: white; color: #27ae60; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Acessar Admin
+        </a>
+    </div>
+</div>
+
+<div style="margin-top: 50px; padding: 30px; background-color: #ecf0f1; border-radius: 10px;">
+    <h3>🎯 Novas Regras do Jogo</h3>
+    <ul style="list-style: none; padding: 0;">
+        <li style="margin: 10px 0; padding: 10px; background-color: white; border-radius: 5px;">
+            🏆 <strong>Pontuação Máxima:</strong> Jogos vão até 20 pontos
+        </li>
+        <li style="margin: 10px 0; padding: 10px; background-color: white; border-radius: 5px;">
+            🔥 <strong>Capotinho:</strong> Quando a dupla perdedora faz 10 pontos ou menos
+        </li>
+        <li style="margin: 10px 0; padding: 10px; background-color: white; border-radius: 5px;">
+            📊 <strong>Estatísticas:</strong> Capotinhos dados e tomados são contabilizados
+        </li>
+        <li style="margin: 10px 0; padding: 10px; background-color: white; border-radius: 5px;">
+            ⚡ <strong>Lançamento:</strong> Jogadores podem registrar resultados diretamente
+        </li>
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'jogos/base.html' %}
+
+{% block title %}Ranking Individual - {{ ano }}{% endblock %}
+
+{% block content %}
+<h2>📊 Ranking Individual - {{ ano }}{% if trimestre %} - {{ trimestre }}º Trimestre{% endif %}</h2>
+
+<div class="filters">
+    <form method="get">
+        <label for="trimestre">Filtrar por trimestre:</label>
+        <select name="trimestre" id="trimestre">
+            <option value="">Todos os trimestres</option>
+            {% for trim in trimestres %}
+                <option value="{{ trim.valor }}" {% if trimestre == trim.valor %}selected{% endif %}>
+                    {{ trim.nome }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <label for="min_partidas">Partidas mínimas:</label>
+        <input type="number" name="min_partidas" id="min_partidas" 
+               value="{{ partidas_minimas }}" min="1" max="50">
+        
+        <button type="submit">Aplicar Filtros</button>
+    </form>
+</div>
+
+{% if ranking %}
+    <div style="margin-bottom: 20px;">
+        <p><strong>Total de jogadores:</strong> {{ ranking|length }}</p>
+        <p><strong>Critério de ordenação:</strong> Eficiência e depois média de pontos</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Posição</th>
+                <th>Jogador</th>
+                <th>Partidas</th>
+                <th>Pontos</th>
+                <th>Vitórias</th>
+                <th>Média de Pontos</th>
+                <th>Eficiência (%)</th>
+                <th>Capotinhos Dados</th>
+                <th>Capotinhos Tomados</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in ranking %}
+            <tr>
+                <td class="rank-position">{{ forloop.counter }}º</td>
+                <td><strong>{{ item.jogador }}</strong></td>
+                <td>{{ item.partidas }}</td>
+                <td>{{ item.pontos }}</td>
+                <td>{{ item.vitorias }}</td>
+                <td>{{ item.media_pontos|floatformat:2 }}</td>
+                <td class="{% if item.eficiencia >= 70 %}efficiency-high{% elif item.eficiencia >= 50 %}efficiency-medium{% else %}efficiency-low{% endif %}">
+                    {{ item.eficiencia|floatformat:1 }}%
+                </td>
+                <td style="color: #27ae60; font-weight: bold;">{{ item.capotinhos_dados }}</td>
+                <td style="color: #e74c3c; font-weight: bold;">{{ item.capotinhos_tomados }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div style="text-align: center; padding: 40px;">
+        <h3>📭 Nenhum jogador encontrado</h3>
+        <p>Não há jogadores que atendam aos critérios de filtro selecionados.</p>
+        <p>Tente reduzir o número mínimo de partidas ou alterar o período.</p>
+    </div>
+{% endif %}
+
+<div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
+    <h4>ℹ️ Informações sobre o Ranking</h4>
+    <ul>
+        <li><strong>Eficiência:</strong> Percentual de vitórias em relação ao total de partidas</li>
+        <li><strong>Média de Pontos:</strong> Pontos totais divididos pelo número de partidas</li>
+        <li><strong>Ordenação:</strong> Primeiro por eficiência, depois por média de pontos</li>
+        <li><strong>Cores da Eficiência:</strong> 
+            <span class="efficiency-high">Verde ≥ 70%</span>, 
+            <span class="efficiency-medium">Laranja ≥ 50%</span>, 
+            <span class="efficiency-low">Vermelho < 50%</span>
+        </li>
+    </ul>
+</div>
+{% endblock %}

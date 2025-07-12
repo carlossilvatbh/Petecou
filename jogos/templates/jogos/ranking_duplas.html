@@ -1,0 +1,83 @@
+{% extends 'jogos/base.html' %}
+
+{% block title %}Ranking de Duplas - {{ ano }}{% endblock %}
+
+{% block content %}
+<h2>👥 Ranking de Duplas - {{ ano }}{% if trimestre %} - {{ trimestre }}º Trimestre{% endif %}</h2>
+
+<div class="filters">
+    <form method="get">
+        <label for="trimestre">Filtrar por trimestre:</label>
+        <select name="trimestre" id="trimestre">
+            <option value="">Todos os trimestres</option>
+            {% for trim in trimestres %}
+                <option value="{{ trim.valor }}" {% if trimestre == trim.valor %}selected{% endif %}>
+                    {{ trim.nome }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <label for="min_partidas">Partidas mínimas:</label>
+        <input type="number" name="min_partidas" id="min_partidas" 
+               value="{{ partidas_minimas }}" min="1" max="50">
+        
+        <button type="submit">Aplicar Filtros</button>
+    </form>
+</div>
+
+{% if ranking %}
+    <div style="margin-bottom: 20px;">
+        <p><strong>Total de duplas:</strong> {{ ranking|length }}</p>
+        <p><strong>Critério de ordenação:</strong> Número de vitórias e depois eficiência</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Posição</th>
+                <th>Dupla</th>
+                <th>Partidas</th>
+                <th>Vitórias</th>
+                <th>Eficiência (%)</th>
+                <th>Capotinhos Dados</th>
+                <th>Capotinhos Tomados</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in ranking %}
+            <tr>
+                <td class="rank-position">{{ forloop.counter }}º</td>
+                <td><strong>{{ item.dupla }}</strong></td>
+                <td>{{ item.partidas }}</td>
+                <td>{{ item.vitorias }}</td>
+                <td class="{% if item.eficiencia >= 70 %}efficiency-high{% elif item.eficiencia >= 50 %}efficiency-medium{% else %}efficiency-low{% endif %}">
+                    {{ item.eficiencia|floatformat:1 }}%
+                </td>
+                <td style="color: #27ae60; font-weight: bold;">{{ item.capotinhos_dados }}</td>
+                <td style="color: #e74c3c; font-weight: bold;">{{ item.capotinhos_tomados }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div style="text-align: center; padding: 40px;">
+        <h3>📭 Nenhuma dupla encontrada</h3>
+        <p>Não há duplas que atendam aos critérios de filtro selecionados.</p>
+        <p>Tente reduzir o número mínimo de partidas ou alterar o período.</p>
+    </div>
+{% endif %}
+
+<div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
+    <h4>ℹ️ Informações sobre o Ranking</h4>
+    <ul>
+        <li><strong>Eficiência:</strong> Percentual de vitórias em relação ao total de partidas</li>
+        <li><strong>Ordenação:</strong> Primeiro por número de vitórias, depois por eficiência</li>
+        <li><strong>Dupla:</strong> Combinação de dois jogadores que jogaram juntos</li>
+        <li><strong>Cores da Eficiência:</strong> 
+            <span class="efficiency-high">Verde ≥ 70%</span>, 
+            <span class="efficiency-medium">Laranja ≥ 50%</span>, 
+            <span class="efficiency-low">Vermelho < 50%</span>
+        </li>
+    </ul>
+</div>
+{% endblock %}
