@@ -11,7 +11,11 @@ echo "🔧 Collecting static files..."
 python manage.py collectstatic --noinput
 
 echo "🗄️ Running database migrations..."
-python manage.py migrate
+python manage.py makemigrations --noinput
+python manage.py migrate --noinput
+
+echo "🔍 Debugging database..."
+python manage.py debug_db
 
 echo "👤 Creating superuser if needed..."
 # Criar superuser automaticamente se não existir
