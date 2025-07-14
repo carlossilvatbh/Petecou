@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.http import JsonResponse
+from django.conf import settings
 from .utils import ranking_individual, ranking_duplas, filtrar_por_periodo
 from .models import Dupla, Partida
 
@@ -128,3 +130,22 @@ def lancar_resultado_view(request):
     }
     
     return render(request, 'jogos/lancar_resultado.html', context)
+
+
+def health_check(request):
+    """View simples para verificar se o app está funcionando"""
+    return JsonResponse({
+        'status': 'ok',
+        'debug': settings.DEBUG,
+        'database': 'connected' if _test_db_connection() else 'error'
+    })
+
+def _test_db_connection():
+    """Testa conexão com banco de dados"""
+    try:
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            return True
+    except Exception:
+        return False

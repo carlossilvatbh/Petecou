@@ -11,4 +11,5 @@ urlpatterns = [
          name='ranking_duplas'),
     path('lancar-resultado/', views.lancar_resultado_view,
          name='lancar_resultado'),
+    path('health/', views.health_check, name='health_check'),
 ]
