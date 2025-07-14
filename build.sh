@@ -12,10 +12,18 @@ python manage.py collectstatic --noinput
 
 echo "🗄️ Running database migrations..."
 python manage.py makemigrations --noinput
-python manage.py migrate --noinput
+
+# Try normal migrate first
+echo "🔄 Attempting normal migration..."
+if ! python manage.py migrate --noinput; then
+    echo "❌ Normal migration failed, creating tables manually..."
+    python manage.py create_tables
+else
+    echo "✅ Normal migration successful"
+fi
 
 echo "🔍 Debugging database..."
-python manage.py debug_db
+python manage.py debug_db || echo "⚠️ Debug failed, continuing..."
 
 echo "👤 Creating superuser if needed..."
 # Criar superuser automaticamente se não existir
