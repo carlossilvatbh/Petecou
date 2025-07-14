@@ -133,12 +133,29 @@ def lancar_resultado_view(request):
 
 
 def health_check(request):
-    """View simples para verificar se o app está funcionando"""
+    """View para verificar se o app está funcionando"""
+    import os
+    
+    try:
+        # Test database connection
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            db_status = 'connected'
+    except Exception as e:
+        db_status = f'error: {str(e)}'
+    
     return JsonResponse({
         'status': 'ok',
         'debug': settings.DEBUG,
-        'database': 'connected' if _test_db_connection() else 'error'
+        'database': db_status,
+        'database_url_configured': bool(os.environ.get('DATABASE_URL')),
+        'secret_key_configured': bool(os.environ.get('SECRET_KEY')),
+        'render_hostname': (os.environ.get('RENDER_EXTERNAL_HOSTNAME') or
+                            'not set'),
+        'allowed_hosts': settings.ALLOWED_HOSTS,
     })
+
 
 def _test_db_connection():
     """Testa conexão com banco de dados"""

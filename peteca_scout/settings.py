@@ -30,16 +30,25 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
+# ALLOWED_HOSTS configuration for production
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '.render.com',
-    '.onrender.com',
+    '*.render.com',
+    '*.onrender.com',
 ]
 
-# Add Render hostname if available
-if 'RENDER_EXTERNAL_HOSTNAME' in os.environ:
-    ALLOWED_HOSTS.append(os.environ['RENDER_EXTERNAL_HOSTNAME'])
+# Add any Render hostname dynamically
+render_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if render_hostname:
+    ALLOWED_HOSTS.append(render_hostname)
+
+# In production, allow all Render subdomains
+if not DEBUG:
+    ALLOWED_HOSTS.extend([
+        '.render.com',
+        '.onrender.com'
+    ])
 
 
 # Application definition
@@ -90,9 +99,11 @@ WSGI_APPLICATION = 'peteca_scout.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # Database configuration with environment variable support
-if os.environ.get('DATABASE_URL'):
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
     DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+        'default': dj_database_url.parse(DATABASE_URL)
     }
 else:
     DATABASES = {
@@ -100,6 +111,12 @@ else:
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
+    }
+
+# Add connection options for PostgreSQL in production
+if DATABASE_URL and 'postgresql' in DATABASE_URL:
+    DATABASES['default']['OPTIONS'] = {
+        'connect_timeout': 10,
     }
 
 
